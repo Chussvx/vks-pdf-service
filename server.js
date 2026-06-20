@@ -1,9 +1,15 @@
-// VKS PDF render service - Render.com Web Service version.
-// Persistent Express + Puppeteer. The browser launches once on startup and
-// is reused for every request, so cold start hits only the first call.
+// VKS PDF render service - Render.com Web Service.
+//
+// Uses puppeteer-core + @sparticuz/chromium because:
+//   - The chromium binary ships inside the npm package, so npm install pulls
+//     a complete working browser in one step (no separate download race).
+//   - Render's Debian-based runtime has libnss3 / libnspr4 / etc. that
+//     @sparticuz/chromium needs at runtime (Vercel's AL2023 image doesn't,
+//     which is why this combo failed there but works here).
 
 import express from 'express';
-import puppeteer from 'puppeteer';
+import chromium from '@sparticuz/chromium';
+import puppeteer from 'puppeteer-core';
 
 const PORT = process.env.PORT || 3000;
 const ALLOW_ORIGIN = process.env.ALLOW_ORIGIN || '*';
@@ -26,14 +32,10 @@ let browserPromise = null;
 async function getBrowser() {
   if (!browserPromise) {
     browserPromise = puppeteer.launch({
-      headless: 'new',
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-gpu',
-        '--font-render-hinting=none',
-      ],
+      args: [...chromium.args, '--font-render-hinting=none'],
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
     }).catch(err => {
       browserPromise = null;
       throw err;
@@ -42,9 +44,8 @@ async function getBrowser() {
   return browserPromise;
 }
 
-// Health check / wake endpoint (Render free tier sleeps after 15min idle)
 app.get('/', (req, res) => {
-  res.json({ ok: true, service: 'vks-pdf', version: '2.0.0' });
+  res.json({ ok: true, service: 'vks-pdf', version: '3.0.0' });
 });
 app.get('/health', (req, res) => {
   res.json({ ok: true });

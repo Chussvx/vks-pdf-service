@@ -1,6 +1,6 @@
 {
   "name": "vks-pdf-service",
-  "version": "2.0.2",
+  "version": "3.0.0",
   "description": "Server-side HTML to PDF rendering for VKS reports.",
   "private": true,
   "type": "module",
@@ -9,8 +9,9 @@
     "start": "node server.js"
   },
   "dependencies": {
+    "@sparticuz/chromium": "131.0.1",
     "express": "^4.21.1",
-    "puppeteer": "^23.10.4"
+    "puppeteer-core": "23.10.4"
   },
   "engines": {
     "node": "20.x"

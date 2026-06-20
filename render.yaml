@@ -4,14 +4,10 @@ services:
     runtime: node
     plan: free
     region: singapore
-    buildCommand: npm install && npx puppeteer browsers install chrome
+    buildCommand: npm install
     startCommand: npm start
     envVars:
       - key: NODE_VERSION
         value: 20
-      - key: PUPPETEER_CACHE_DIR
-        value: /opt/render/project/src/.cache/puppeteer
-      - key: PUPPETEER_SKIP_DOWNLOAD
-        value: "false"
     autoDeploy: true
     healthCheckPath: /health
