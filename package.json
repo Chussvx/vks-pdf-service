@@ -1,6 +1,6 @@
 {
   "name": "vks-pdf-service",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Server-side HTML to PDF rendering for VKS reports.",
   "private": true,
   "type": "module",

@@ -28,15 +28,36 @@ app.use((req, res, next) => {
 });
 
 // Long-lived browser instance. Relaunched if it crashes.
+// Retries on ETXTBSY because @sparticuz/chromium extracts its bundled binary
+// lazily on first call - if puppeteer.launch() races the extraction, Linux
+// rejects the spawn with ETXTBSY (text file busy).
 let browserPromise = null;
+async function launchWithRetry(maxAttempts = 4) {
+  const execPath = await chromium.executablePath();
+  let lastErr;
+  for (let i = 1; i <= maxAttempts; i++) {
+    try {
+      return await puppeteer.launch({
+        args: [...chromium.args, '--font-render-hinting=none'],
+        defaultViewport: chromium.defaultViewport,
+        executablePath: execPath,
+        headless: chromium.headless,
+      });
+    } catch (err) {
+      lastErr = err;
+      const msg = String(err && err.message || err);
+      const isBusy = msg.includes('ETXTBSY') || msg.includes('text file busy');
+      console.error(`[vks-pdf] launch attempt ${i}/${maxAttempts} failed:`, msg);
+      if (!isBusy || i === maxAttempts) throw err;
+      // Exponential backoff: 500ms, 1s, 2s
+      await new Promise(r => setTimeout(r, 500 * Math.pow(2, i - 1)));
+    }
+  }
+  throw lastErr;
+}
 async function getBrowser() {
   if (!browserPromise) {
-    browserPromise = puppeteer.launch({
-      args: [...chromium.args, '--font-render-hinting=none'],
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
-    }).catch(err => {
+    browserPromise = launchWithRetry().catch(err => {
       browserPromise = null;
       throw err;
     });
@@ -45,7 +66,7 @@ async function getBrowser() {
 }
 
 app.get('/', (req, res) => {
-  res.json({ ok: true, service: 'vks-pdf', version: '3.0.0' });
+  res.json({ ok: true, service: 'vks-pdf', version: '3.0.1' });
 });
 app.get('/health', (req, res) => {
   res.json({ ok: true });
