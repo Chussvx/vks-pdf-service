@@ -1,13 +1,12 @@
 {
   "name": "vks-pdf-service",
-  "version": "2.0.1",
-  "description": "Server-side HTML to PDF rendering for VKS reports. Express + Puppeteer on Render.com free tier.",
+  "version": "2.0.2",
+  "description": "Server-side HTML to PDF rendering for VKS reports.",
   "private": true,
   "type": "module",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "postinstall": "node node_modules/puppeteer/install.mjs"
+    "start": "node server.js"
   },
   "dependencies": {
     "express": "^4.21.1",
