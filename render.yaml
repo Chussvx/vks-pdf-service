@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: vks-pdf-service
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: PUPPETEER_SKIP_DOWNLOAD
+        value: "false"
+    autoDeploy: true
+    healthCheckPath: /health
