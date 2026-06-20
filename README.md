@@ -7,7 +7,13 @@ Free server-side PDF rendering for VKS reports. Express + Puppeteer on Render.co
 `POST /api/pdf` with `{ html, filename?, landscape?, format? }` returns a server-rendered PDF blob.
 Real Chromium engine, vector text, embedded fonts, proper multi-page output.
 
-## Deploy (one time, 5 minutes)
+## One-click deploy
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Chussvx/vks-pdf-service)
+
+Click the button, sign into Render with GitHub, click **Apply**. Done.
+
+## Manual deploy (5 minutes)
 
 1. **Push this folder to a GitHub repo.** Easiest path: create a new public repo called `vks-pdf-service`, push these files.
 2. **Sign in to render.com** with GitHub.
